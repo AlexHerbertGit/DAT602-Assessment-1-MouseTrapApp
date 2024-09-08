@@ -34,6 +34,9 @@
             textBox2 = new TextBox();
             textBox3 = new TextBox();
             textBox4 = new TextBox();
+            textBox5 = new TextBox();
+            pictureBox1 = new PictureBox();
+            ((System.ComponentModel.ISupportInitialize)pictureBox1).BeginInit();
             SuspendLayout();
             // 
             // tableLayoutPanel1
@@ -130,11 +133,12 @@
             // 
             // textBox1
             // 
-            textBox1.Location = new Point(34, 91);
+            textBox1.Location = new Point(34, 191);
             textBox1.Multiline = true;
             textBox1.Name = "textBox1";
             textBox1.PlaceholderText = "CHAT BOX WINDOW";
-            textBox1.Size = new Size(267, 562);
+            textBox1.ReadOnly = true;
+            textBox1.Size = new Size(267, 462);
             textBox1.TabIndex = 1;
             // 
             // textBox2
@@ -155,11 +159,30 @@
             // 
             // textBox4
             // 
-            textBox4.Location = new Point(445, 631);
+            textBox4.Location = new Point(448, 630);
             textBox4.Name = "textBox4";
+            textBox4.PlaceholderText = "Player 1 Inventory";
             textBox4.Size = new Size(335, 23);
             textBox4.TabIndex = 4;
-            textBox4.TextChanged += textBox4_TextChanged;
+            textBox4.TextChanged += this.textBox4_TextChanged;
+            // 
+            // textBox5
+            // 
+            textBox5.Location = new Point(923, 630);
+            textBox5.Name = "textBox5";
+            textBox5.PlaceholderText = "Player 2 Inventory";
+            textBox5.Size = new Size(306, 23);
+            textBox5.TabIndex = 5;
+            // 
+            // pictureBox1
+            // 
+            pictureBox1.BackgroundImage = (Image)resources.GetObject("pictureBox1.BackgroundImage");
+            pictureBox1.BackgroundImageLayout = ImageLayout.Stretch;
+            pictureBox1.Location = new Point(76, 12);
+            pictureBox1.Name = "pictureBox1";
+            pictureBox1.Size = new Size(182, 173);
+            pictureBox1.TabIndex = 6;
+            pictureBox1.TabStop = false;
             // 
             // GameBoard
             // 
@@ -167,6 +190,8 @@
             AutoScaleMode = AutoScaleMode.Font;
             BackgroundImage = (Image)resources.GetObject("$this.BackgroundImage");
             ClientSize = new Size(1264, 681);
+            Controls.Add(pictureBox1);
+            Controls.Add(textBox5);
             Controls.Add(textBox4);
             Controls.Add(textBox3);
             Controls.Add(textBox2);
@@ -174,6 +199,7 @@
             Controls.Add(tableLayoutPanel1);
             Name = "GameBoard";
             Text = "GameBoard";
+            ((System.ComponentModel.ISupportInitialize)pictureBox1).EndInit();
             ResumeLayout(false);
             PerformLayout();
         }
@@ -185,5 +211,7 @@
         private TextBox textBox2;
         private TextBox textBox3;
         private TextBox textBox4;
+        private TextBox textBox5;
+        private PictureBox pictureBox1;
     }
 }
