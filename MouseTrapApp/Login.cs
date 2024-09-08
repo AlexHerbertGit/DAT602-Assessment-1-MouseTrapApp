@@ -42,6 +42,13 @@ namespace MouseTrapApp
 
         }
 
+        private void btnOpenRegistrationForm_Click(object sender, EventArgs e)
+        {
+            Registration registrationForm = new Registration();
+
+            registrationForm.Show();
+        }
+
         private void btnLoginConfirm_Click(object sender, EventArgs e)
         {
             string username = txtUsernameLogin.Text;

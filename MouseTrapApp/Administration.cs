@@ -10,16 +10,11 @@ using System.Windows.Forms;
 
 namespace MouseTrapApp
 {
-    public partial class GameBoard : Form
+    public partial class Administration : Form
     {
-        public GameBoard()
+        public Administration()
         {
             InitializeComponent();
-        }
-
-        static void textBox4_TextChanged(object sender, EventArgs e)
-        {
-
         }
     }
 }

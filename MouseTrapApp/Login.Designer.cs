@@ -35,12 +35,14 @@
             txtPasswordLogin = new TextBox();
             txtUsernameLogin = new TextBox();
             imgLogo = new PictureBox();
+            btnOpenRegistrationForm = new Button();
             groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)imgLogo).BeginInit();
             SuspendLayout();
             // 
             // groupBox1
             // 
+            groupBox1.Controls.Add(btnOpenRegistrationForm);
             groupBox1.Controls.Add(btnLoginConfirm);
             groupBox1.Controls.Add(loginLabel);
             groupBox1.Controls.Add(txtPasswordLogin);
@@ -103,6 +105,16 @@
             imgLogo.TabIndex = 1;
             imgLogo.TabStop = false;
             // 
+            // btnOpenRegistrationForm
+            // 
+            btnOpenRegistrationForm.Location = new Point(145, 275);
+            btnOpenRegistrationForm.Name = "btnOpenRegistrationForm";
+            btnOpenRegistrationForm.Size = new Size(118, 26);
+            btnOpenRegistrationForm.TabIndex = 4;
+            btnOpenRegistrationForm.Text = "Register Here!";
+            btnOpenRegistrationForm.UseVisualStyleBackColor = true;
+            btnOpenRegistrationForm.Click += this.btnOpenRegistrationForm_Click;
+            // 
             // Login
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
@@ -128,5 +140,6 @@
         private TextBox txtPasswordLogin;
         private Button btnLoginConfirm;
         private PictureBox imgLogo;
+        private Button btnOpenRegistrationForm;
     }
 }
