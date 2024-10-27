@@ -54,15 +54,25 @@ namespace MouseTrapApp
             string username = txtUsernameLogin.Text;
             string password = txtPasswordLogin.Text;
 
-            if (UserDOA.LoginUser(username, password))
+            var (loginSuccessful, accountLocked) = UserDOA.LoginUser(username, password);
+
+            if (accountLocked)
+            {
+                MessageBox.Show("User Account is locked due to multiple failed login attempts, please contact and admin");
+            }
+            else if (loginSuccessful)
             {
                 MessageBox.Show("Login successful!");
 
-                //Add logic to open the Main Menu Here
+                //Create and Display Main Menu Window
+                MainMenu mainMenu = new MainMenu();
+                mainMenu.Show();
+
+                this.Hide();
             }
             else
             {
-                MessageBox.Show("Invalid username or password. PLease try again.");
+                MessageBox.Show("Invalid username or password. Please try again.");
             }
         }
     }

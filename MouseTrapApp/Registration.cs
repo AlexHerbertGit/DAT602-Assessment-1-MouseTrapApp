@@ -45,12 +45,18 @@ namespace MouseTrapApp
                 return;
             }
 
+            if (password.Length < 6)
+            {
+                MessageBox.Show("Password must be at least 6 chracters long, try again");
+                return;
+            }
+
             bool userCreated = UserDOA.CreateUser(username, password);
 
             if (userCreated)
             {
                 MessageBox.Show("Registration successful!");
-
+                //Close the Registration Form
                 this.Close();
             }
             else
