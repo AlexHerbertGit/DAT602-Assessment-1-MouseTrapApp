@@ -15,9 +15,10 @@ namespace MouseTrapApp
         private int gameId;
         private int maxRows;
         private int maxColumns;
+        private int mapId;
         private List<Tile> tiles;
 
-        public GameBoard(int gameId, int maxRows, int maxColumns, List<Tile> tiles)
+        public GameBoard(int gameId, int maxRows, int maxColumns, int mapId, List<Tile> tiles)
         {
             InitializeComponent();
 
@@ -25,6 +26,7 @@ namespace MouseTrapApp
             this.gameId = gameId;
             this.maxRows = maxRows;
             this.maxColumns = maxColumns;
+            this.mapId = mapId;
             this.tiles = tiles ?? new List<Tile>();
 
             //Set up the data grid view with the correct dimensions
@@ -76,69 +78,63 @@ namespace MouseTrapApp
 
                     if (cell != null)
                     {
-                        Console.WriteLine($"Setting tile at ({tile.PositionX}. {tile.PositionY})");
+                        Console.WriteLine($"Setting tile at ({tile.PositionX}, {tile.PositionY})");
 
-                        // Check TileTypeId and set all the cell properties according to the value
-                        if (tile.TileTypeId == 1)
-                        {
-                            cell.Style.BackColor = Color.LightGray;
-                        }
-                        else if (tile.TileTypeId == 2)
-                        {
-                            // Convert cell to DataGridViewImageCell for images
-                            DataGridViewImageCell imageCell = new DataGridViewImageCell
-                            {
-                                Value = Properties.Resources.BarrierImage,
-                                ImageLayout = DataGridViewImageCellLayout.Zoom
-                            };
-
-                            dataGridView1.Rows[row].Cells[col] = imageCell;
-                            imageCell.Style.Alignment = DataGridViewContentAlignment.MiddleCenter;
-                        }
-                        else if (tile.TileTypeId == 3)
-                        {
-                            cell.Style.BackColor = Color.Transparent;
-                        }
-                        else if (tile.TileTypeId == 4)
-                        {
-                            cell.Style.BackColor = Color.Black;
-                        }
-
-                        //Add Items to cells based on ItemId
-                        if (tile.ItemId == 1)
+                        // Check if there's an item on the tile first
+                        if (tile.ItemId != null)
                         {
                             DataGridViewImageCell itemCell = new DataGridViewImageCell
                             {
-                                Value = Properties.Resources.CheeseImage,
-                                ImageLayout = DataGridViewImageCellLayout.Zoom
+                                ImageLayout = DataGridViewImageCellLayout.Zoom,
+                                Style = { Alignment = DataGridViewContentAlignment.MiddleCenter }
                             };
-                            dataGridView1.Rows[row].Cells[col] = itemCell;
-                            itemCell.Style.Alignment = DataGridViewContentAlignment.MiddleCenter;
-                        }
-                        else if (tile.ItemId == 2)
-                        {
-                            DataGridViewImageCell itemCell = new DataGridViewImageCell
+
+                            // Set the image based on ItemId
+                            if (tile.ItemId == 1)
                             {
-                                Value = Properties.Resources.PaperClipImage,
-                                ImageLayout = DataGridViewImageCellLayout.Zoom
-                            };
-                            dataGridView1.Rows[row].Cells[col] = itemCell;
-                            itemCell.Style.Alignment= DataGridViewContentAlignment.MiddleCenter;
-                        }
-                        else if (tile.ItemId == 3)
-                        {
-                            DataGridViewImageCell itemCell = new DataGridViewImageCell
+                                itemCell.Value = Properties.Resources.CheeseImage;
+                            }
+                            else if (tile.ItemId == 2)
                             {
-                                Value = Properties.Resources.PeanutImage,
-                                ImageLayout = DataGridViewImageCellLayout.Zoom
-                            };
-                            dataGridView1.Rows[row].Cells[col] = itemCell;
-                            itemCell.Style.Alignment = DataGridViewContentAlignment.MiddleCenter;
+                                itemCell.Value = Properties.Resources.PaperClipImage;
+                            }
+                            else if (tile.ItemId == 3)
+                            {
+                                itemCell.Value = Properties.Resources.PeanutImage;
+                            }
+
+                            dataGridView1.Rows[row].Cells[col] = itemCell; // Add item image to cell
                         }
                         else
                         {
-                            Console.WriteLine($"No cell found at position ({tile.PositionX}, {tile.PositionY}");
+                            // Only set the background for TileTypeId if there is no item
+                            if (tile.TileTypeId == 1)
+                            {
+                                cell.Style.BackColor = Color.LightGray; // Home Tile
+                            }
+                            else if (tile.TileTypeId == 2)
+                            {
+                                DataGridViewImageCell barrierCell = new DataGridViewImageCell
+                                {
+                                    Value = Properties.Resources.BarrierImage,
+                                    ImageLayout = DataGridViewImageCellLayout.Zoom,
+                                    Style = { Alignment = DataGridViewContentAlignment.MiddleCenter }
+                                };
+                                dataGridView1.Rows[row].Cells[col] = barrierCell;
+                            }
+                            else if (tile.TileTypeId == 3)
+                            {
+                                cell.Style.BackColor = Color.White; // Empty Tile
+                            }
+                            else if (tile.TileTypeId == 4)
+                            {
+                                cell.Style.BackColor = Color.Black; // Finish Tile
+                            }
                         }
+                    }
+                    else
+                    {
+                        Console.WriteLine($"No cell found at position ({tile.PositionX}, {tile.PositionY})");
                     }
                 }
             }

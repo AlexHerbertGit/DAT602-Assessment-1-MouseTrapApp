@@ -34,9 +34,9 @@ namespace MouseTrapApp
 
         private void btnStartGame_Click(object sender, EventArgs e)
         {
-            var (gameId, maxRows, maxColumns, tiles) = DOA.InitializeNewGameAndBoard();
+            var (gameId, maxRows, maxColumns, mapId, tiles) = DOA.InitializeNewGameAndBoard();
 
-            GameBoard gameBoard = new GameBoard(gameId, maxRows, maxColumns, tiles);
+            GameBoard gameBoard = new GameBoard(gameId, maxRows, maxColumns, mapId, tiles);
 
             //Show the GameBoard form window
             gameBoard.ShowDialog();
