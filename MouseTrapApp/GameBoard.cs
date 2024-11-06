@@ -103,6 +103,38 @@ namespace MouseTrapApp
                         {
                             cell.Style.BackColor = Color.Black;
                         }
+
+                        //Add Items to cells based on ItemId
+                        if (tile.ItemId == 1)
+                        {
+                            DataGridViewImageCell itemCell = new DataGridViewImageCell
+                            {
+                                Value = Properties.Resources.CheeseImage,
+                                ImageLayout = DataGridViewImageCellLayout.Zoom
+                            };
+                            dataGridView1.Rows[row].Cells[col] = itemCell;
+                            itemCell.Style.Alignment = DataGridViewContentAlignment.MiddleCenter;
+                        }
+                        else if (tile.ItemId == 2)
+                        {
+                            DataGridViewImageCell itemCell = new DataGridViewImageCell
+                            {
+                                Value = Properties.Resources.PaperClipImage,
+                                ImageLayout = DataGridViewImageCellLayout.Zoom
+                            };
+                            dataGridView1.Rows[row].Cells[col] = itemCell;
+                            itemCell.Style.Alignment= DataGridViewContentAlignment.MiddleCenter;
+                        }
+                        else if (tile.ItemId == 3)
+                        {
+                            DataGridViewImageCell itemCell = new DataGridViewImageCell
+                            {
+                                Value = Properties.Resources.PeanutImage,
+                                ImageLayout = DataGridViewImageCellLayout.Zoom
+                            };
+                            dataGridView1.Rows[row].Cells[col] = itemCell;
+                            itemCell.Style.Alignment = DataGridViewContentAlignment.MiddleCenter;
+                        }
                         else
                         {
                             Console.WriteLine($"No cell found at position ({tile.PositionX}, {tile.PositionY}");

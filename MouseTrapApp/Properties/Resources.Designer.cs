@@ -71,12 +71,12 @@ namespace MouseTrapApp.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        ///   Looks up a localized resource of type System.Byte[].
         /// </summary>
-        internal static System.Drawing.Bitmap ItemImage {
+        internal static byte[] CheeseImage {
             get {
-                object obj = ResourceManager.GetObject("ItemImage", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
+                object obj = ResourceManager.GetObject("CheeseImage", resourceCulture);
+                return ((byte[])(obj));
             }
         }
         
@@ -87,6 +87,26 @@ namespace MouseTrapApp.Properties {
             get {
                 object obj = ResourceManager.GetObject("MouseTrapImage", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
+        internal static byte[] PaperClipImage {
+            get {
+                object obj = ResourceManager.GetObject("PaperClipImage", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
+        internal static byte[] PeanutImage {
+            get {
+                object obj = ResourceManager.GetObject("PeanutImage", resourceCulture);
+                return ((byte[])(obj));
             }
         }
         

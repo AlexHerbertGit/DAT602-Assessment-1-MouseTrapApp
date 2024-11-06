@@ -38,6 +38,7 @@ namespace MouseTrapApp
             int gameId = -1;
             int maxRows = 0;
             int maxColumns = 0;
+            int mapId = -1;
             List<Tile> tiles = new List<Tile>();
 
             try
@@ -81,9 +82,14 @@ namespace MouseTrapApp
                     {
                         Direction = ParameterDirection.Output
                     };
+                    MySqlParameter mapIdParam = new MySqlParameter("p_map_id", MySqlDbType.Int32)
+                    {
+                        Direction = ParameterDirection.Output
+                    };
 
                     getMapDimensionsCmd.Parameters.Add(maxRowsParam);
                     getMapDimensionsCmd.Parameters.Add(maxColumnsParam);
+                    getMapDimensionsCmd.Parameters.Add(mapIdParam);
 
                     //Execute the procedure
                     getMapDimensionsCmd.ExecuteNonQuery();
@@ -91,7 +97,11 @@ namespace MouseTrapApp
                     // Fecth max rows and columns from query results
                     maxRows = maxRowsParam.Value != DBNull.Value ? Convert.ToInt32(maxRowsParam.Value) : 0;
                     maxColumns = maxColumnsParam.Value != DBNull.Value ? Convert.ToInt32(maxColumnsParam.Value) : 0;
+                    mapId = mapIdParam.Value != DBNull.Value ? Convert.ToInt32(mapIdParam.Value) : -1;
                 }
+
+                //Populate board with Items
+                PopulateItemsOnBoard(mapId);
 
                 //Retreive Tile data using the GetTilesForGame procedure
                 using (MySqlCommand getTilesCmd = new MySqlCommand("GetTilesForGame", mySqlConnection))
@@ -129,6 +139,33 @@ namespace MouseTrapApp
                 }
             }
             return (gameId, maxRows, maxColumns, tiles);
+        }
+
+        public static void PopulateItemsOnBoard(int mapId)
+        {
+            try
+            {
+                mySqlConnection.Open();
+
+                using (MySqlCommand cmd = new MySqlCommand("PopulateItemsOnBoard", mySqlConnection))
+                {
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.Parameters.AddWithValue("@p_map_id", mapId);
+
+                    cmd.ExecuteNonQuery();
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Error populating items on board: " + ex.Message);
+            }
+            finally
+            {
+                if (mySqlConnection.State == ConnectionState.Open)
+                {
+                    mySqlConnection.Close();
+                }
+            }
         }
       
     }
