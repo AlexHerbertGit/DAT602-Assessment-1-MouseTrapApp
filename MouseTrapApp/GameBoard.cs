@@ -13,88 +13,101 @@ namespace MouseTrapApp
     public partial class GameBoard : Form
     {
         private int gameId;
-        public GameBoard(int gameId)
+        private int maxRows;
+        private int maxColumns;
+        private List<Tile> tiles;
+
+        public GameBoard(int gameId, int maxRows, int maxColumns, List<Tile> tiles)
         {
             InitializeComponent();
+
+            //Initialize a new game and get game board dimensions and tiles
             this.gameId = gameId;
+            this.maxRows = maxRows;
+            this.maxColumns = maxColumns;
+            this.tiles = tiles ?? new List<Tile>();
+
+            //Set up the data grid view with the correct dimensions
             InitializeGameBoard();
-            PopulateGameBoard(gameId);
+
+            //Populate the game board with tile data
+            PopulateGameBoard();
         }
 
         private void InitializeGameBoard()
         {
-            // Set the column count and configure column width
-            dataGridView1.ColumnCount = 13; // 13 columns for the game board
+            //Set the column count and configuration
+            dataGridView1.ColumnCount = maxColumns;
             foreach (DataGridViewColumn column in dataGridView1.Columns)
             {
-                column.Width = 60; // Set each column width to 60 pixels
-                column.SortMode = DataGridViewColumnSortMode.NotSortable; 
+                column.Width = 50;
+                column.SortMode = DataGridViewColumnSortMode.NotSortable;
             }
 
-            // Add rows and configure row height
-            dataGridView1.RowCount = 12; // 12 rows for the game board
+            //Add rows and configuration
+            dataGridView1.RowCount = maxRows;
             foreach (DataGridViewRow row in dataGridView1.Rows)
             {
-                row.Height = 50; // Set each row height to 60 pixels
+                row.Height = 50;
             }
 
-            // Set other properties for the DataGridView
-            dataGridView1.RowHeadersVisible = false; 
-            dataGridView1.ColumnHeadersVisible = false; 
-            dataGridView1.AllowUserToResizeColumns = false; 
-            dataGridView1.AllowUserToResizeRows = false; 
-            dataGridView1.ScrollBars = ScrollBars.None; 
-            dataGridView1.ReadOnly = true; 
-            dataGridView1.DefaultCellStyle.Padding = new Padding(1); 
+            //Set DataGridView properties to hide column and row headers etc.
+            dataGridView1.RowHeadersVisible = false;
+            dataGridView1.ColumnHeadersVisible = false;
+            dataGridView1.AllowUserToResizeColumns = false;
+            dataGridView1.AllowUserToResizeRows = false;
+            dataGridView1.ScrollBars = ScrollBars.None;
+            dataGridView1.ReadOnly = true;
+            dataGridView1.DefaultCellStyle.Padding = new Padding(1);
         }
-        //Method to populate the game board using the tile data recieved from the database
-        public void PopulateGameBoard(int gameId)
-        {
-            List<Tile> tiles = UserDOA.GetTilesForGame(gameId);
 
-            Console.WriteLine($"Total tiles retrieved: {tiles.Count}"); // Debug output
+        public void PopulateGameBoard()
+        {
+            Console.WriteLine($"Total tiles retrieved: {tiles.Count}");
 
             foreach (Tile tile in tiles)
             {
-                int row = tile.PositionY; // Corrected to PositionY for row
-                int col = tile.PositionX; // Corrected to PositionX for column
+                int row = tile.PositionY;
+                int col = tile.PositionX;
 
-                // Access the specific cell in the DataGridView
-                DataGridViewCell cell = dataGridView1.Rows[row].Cells[col];
-
-                if (cell != null)
+                if (row < maxRows && col < maxColumns)
                 {
-                    Console.WriteLine($"Setting tile at ({tile.PositionX}, {tile.PositionY}) with TileTypeId {tile.TileTypeId}"); // Debug output
+                    DataGridViewCell cell = dataGridView1.Rows[row].Cells[col];
 
-                    // Check TileTypeId and set cell properties accordingly
-                    if (tile.TileTypeId == 1) // Home Tile
+                    if (cell != null)
                     {
-                        cell.Style.BackColor = Color.LightGray;
+                        Console.WriteLine($"Setting tile at ({tile.PositionX}. {tile.PositionY})");
+
+                        // Check TileTypeId and set all the cell properties according to the value
+                        if (tile.TileTypeId == 1)
+                        {
+                            cell.Style.BackColor = Color.LightGray;
+                        }
+                        else if (tile.TileTypeId == 2)
+                        {
+                            // Convert cell to DataGridViewImageCell for images
+                            DataGridViewImageCell imageCell = new DataGridViewImageCell
+                            {
+                                Value = Properties.Resources.BarrierImage,
+                                ImageLayout = DataGridViewImageCellLayout.Zoom
+                            };
+
+                            dataGridView1.Rows[row].Cells[col] = imageCell;
+                            imageCell.Style.Alignment = DataGridViewContentAlignment.MiddleCenter;
+                        }
+                        else if (tile.TileTypeId == 3)
+                        {
+                            cell.Style.BackColor = Color.Transparent;
+                        }
+                        else if (tile.TileTypeId == 4)
+                        {
+                            cell.Style.BackColor = Color.Black;
+                        }
+                        else
+                        {
+                            Console.WriteLine($"No cell found at position ({tile.PositionX}, {tile.PositionY}");
+                        }
                     }
-                    else if (tile.TileTypeId == 2) // Barrier Tile
-                    {
-                        // Convert cell to DataGridViewImageCell for images
-                        dataGridView1.Rows[row].Cells[col] = new DataGridViewImageCell();
-                        cell = dataGridView1.Rows[row].Cells[col];
-                        cell.Value = Properties.Resources.BarrierImage; // Set the barrier image
-                        cell.Style.Alignment = DataGridViewContentAlignment.MiddleCenter;
-                    }
-                    else if (tile.TileTypeId == 3) // Open Tile
-                    {
-                        cell.Style.BackColor = Color.Transparent;
-                    }
-                    else if (tile.TileTypeId == 4) // Finish Tile
-                    {
-                        cell.Style.BackColor = Color.Black;
-                    }
-                    else
-                    {
-                        Console.WriteLine($"Unknown TileTypeId: {tile.TileTypeId} at ({tile.PositionX}, {tile.PositionY})");
-                    }
-                }
-                else
-                {
-                    Console.WriteLine($"No cell found at position ({tile.PositionX}, {tile.PositionY})");
                 }
             }
         }

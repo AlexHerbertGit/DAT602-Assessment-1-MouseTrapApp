@@ -34,11 +34,9 @@ namespace MouseTrapApp
 
         private void btnStartGame_Click(object sender, EventArgs e)
         {
-            //Retrieve the GameID for the new game
-            int gameId = UserDOA.InitializeNewGameAndBoard();
+            var (gameId, maxRows, maxColumns, tiles) = DOA.InitializeNewGameAndBoard();
 
-            //Create an instance of the GameBoard
-            GameBoard gameBoard = new GameBoard(gameId);
+            GameBoard gameBoard = new GameBoard(gameId, maxRows, maxColumns, tiles);
 
             //Show the GameBoard form window
             gameBoard.ShowDialog();
