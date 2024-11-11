@@ -31,10 +31,11 @@ namespace MouseTrapApp
             }
         }
 
-        public static (bool loginSuccessful, bool accountLocked) LoginUser(string username, string password)
+        public static (bool loginSuccessful, bool accountLocked, User user) LoginUser(string username, string password)
         {
             bool loginSuccessful = false;
             bool accountLocked = false;
+            User? user = null;
 
             try
             {
@@ -42,26 +43,53 @@ namespace MouseTrapApp
 
                 using (MySqlCommand cmd = new MySqlCommand("PlayerLogin", mySqlConnection))
                 {
-                    cmd.CommandType = System.Data.CommandType.StoredProcedure;
+                    cmd.CommandType = CommandType.StoredProcedure;
 
-                    //Set up input parameters for username and password
+                    // Set input parameters
                     cmd.Parameters.AddWithValue("p_username", username);
                     cmd.Parameters.AddWithValue("p_password", password);
 
-                    //Define output parameters for return values
-                    cmd.Parameters.Add(new MySqlParameter("p_login_successful", MySqlDbType.Bit));
-                    cmd.Parameters["p_login_successful"].Direction = ParameterDirection.Output;
+                    // Define output parameters
+                    cmd.Parameters.Add(new MySqlParameter("p_login_successful", MySqlDbType.Bit) { Direction = ParameterDirection.Output });
+                    cmd.Parameters.Add(new MySqlParameter("p_account_locked", MySqlDbType.Bit) { Direction = ParameterDirection.Output });
 
-                    cmd.Parameters.Add(new MySqlParameter("p_account_locked", MySqlDbType.Bit));
-                    cmd.Parameters["p_account_locked"].Direction = ParameterDirection.Output;
-
-                    //Execute Stored Procedure
+                    // Execute Stored Procedure
                     cmd.ExecuteNonQuery();
 
-                    //Retrieve output values
+                    // Retrieve output values
                     loginSuccessful = Convert.ToBoolean(cmd.Parameters["p_login_successful"].Value);
                     accountLocked = Convert.ToBoolean(cmd.Parameters["p_account_locked"].Value);
+                }
 
+                // Retrieve user details if login was successful
+                if (loginSuccessful)
+                {
+                    using (MySqlCommand cmd = new MySqlCommand("GetUserDetails", mySqlConnection))
+                    {
+                        cmd.CommandType = CommandType.StoredProcedure;
+                        cmd.Parameters.AddWithValue("p_username", username);
+
+                        cmd.Parameters.Add(new MySqlParameter("p_user_id", MySqlDbType.Int32) { Direction = ParameterDirection.Output });
+                        cmd.Parameters.Add(new MySqlParameter("p_user_name", MySqlDbType.VarChar, 100) { Direction = ParameterDirection.Output });
+                        cmd.Parameters.Add(new MySqlParameter("p_score", MySqlDbType.Int32) { Direction = ParameterDirection.Output });
+                        cmd.Parameters.Add(new MySqlParameter("p_is_admin", MySqlDbType.Bit) { Direction = ParameterDirection.Output });
+                        cmd.Parameters.Add(new MySqlParameter("p_health", MySqlDbType.Int32) { Direction = ParameterDirection.Output });
+                        cmd.Parameters.Add(new MySqlParameter("p_inventory_id", MySqlDbType.Int32) { Direction = ParameterDirection.Output });
+
+                        // Execute stored procedure
+                        cmd.ExecuteNonQuery();
+
+                        // Populate User object with values
+                        user = new User
+                        {
+                            Userid = Convert.ToInt32(cmd.Parameters["p_user_id"].Value),
+                            Username = cmd.Parameters["p_user_name"].Value.ToString(),
+                            Score = Convert.ToInt32(cmd.Parameters["p_score"].Value),
+                            IsAdmin = Convert.ToBoolean(cmd.Parameters["p_is_admin"].Value),
+                            Health = Convert.ToInt32(cmd.Parameters["p_health"].Value),
+                            InventoryId = Convert.ToInt32(cmd.Parameters["p_inventory_id"].Value)
+                        };
+                    }
                 }
             }
             catch (Exception ex)
@@ -70,13 +98,13 @@ namespace MouseTrapApp
             }
             finally
             {
-                if (mySqlConnection.State == System.Data.ConnectionState.Open)
+                if (mySqlConnection.State == ConnectionState.Open)
                 {
                     mySqlConnection.Close();
                 }
             }
 
-            return (loginSuccessful, accountLocked);
+            return (loginSuccessful, accountLocked, user!);
         }
 
         public static bool CreateUser(string username, string password)
@@ -117,6 +145,39 @@ namespace MouseTrapApp
                 }
             }
             return registrationSuccessful;
+        }
+
+        public static bool AddUserToGame(int userId, int gameId)
+        {
+            bool userAddedToGame = false;
+
+            try
+            {
+                // Open a new connection specifically for this method
+                using (MySqlConnection connection = new MySqlConnection(connectionString))
+                {
+                    connection.Open();
+
+                    using (MySqlCommand cmd = new MySqlCommand("AddUserToGame", connection))
+                    {
+                        cmd.CommandType = CommandType.StoredProcedure;
+
+                        // Set the parameters
+                        cmd.Parameters.AddWithValue("p_user_id", userId);
+                        cmd.Parameters.AddWithValue("p_game_id", gameId);
+
+                        // Execute the stored procedure
+                        cmd.ExecuteNonQuery();
+                        userAddedToGame = true;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Error adding user to game: " + ex.Message);
+            }
+
+            return userAddedToGame;
         }
     }
 }

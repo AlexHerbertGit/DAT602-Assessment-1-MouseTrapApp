@@ -54,7 +54,7 @@ namespace MouseTrapApp
             string username = txtUsernameLogin.Text;
             string password = txtPasswordLogin.Text;
 
-            var (loginSuccessful, accountLocked) = UserDOA.LoginUser(username, password);
+            var (loginSuccessful, accountLocked, user) = UserDOA.LoginUser(username, password);
 
             if (accountLocked)
             {
@@ -65,7 +65,7 @@ namespace MouseTrapApp
                 MessageBox.Show("Login successful!");
 
                 //Create and Display Main Menu Window
-                MainMenu mainMenu = new MainMenu();
+                MainMenu mainMenu = new MainMenu(user);
                 mainMenu.Show();
 
                 this.Hide();

@@ -32,8 +32,7 @@ namespace MouseTrapApp
             }
         }
 
-
-        public static (int gameId, int maxRows, int maxColumns, int mapId, List<Tile> tiles) InitializeNewGameAndBoard()
+        public static (int gameId, int maxRows, int maxColumns, int mapId, List<Tile> tiles) InitializeNewGameAndBoard(int userId)
         {
             int gameId = -1;
             int maxRows = 0;
@@ -58,7 +57,6 @@ namespace MouseTrapApp
 
                     createGameCmd.ExecuteNonQuery();
                     gameId = gameIdParam.Value != DBNull.Value ? Convert.ToInt32(gameIdParam.Value) : -1;
-                    Console.WriteLine($"Created Game ID: {gameId}");
                 }
 
                 // Fetch map dimensions
@@ -80,8 +78,13 @@ namespace MouseTrapApp
                     maxRows = maxRowsParam.Value != DBNull.Value ? Convert.ToInt32(maxRowsParam.Value) : 0;
                     maxColumns = maxColumnsParam.Value != DBNull.Value ? Convert.ToInt32(maxColumnsParam.Value) : 0;
                     mapId = mapIdParam.Value != DBNull.Value ? Convert.ToInt32(mapIdParam.Value) : -1;
+                }
 
-                    Console.WriteLine($"Map Dimensions - Max Rows: {maxRows}, Max Columns: {maxColumns}, Map ID: {mapId}");
+                // Add user to the newly created game
+                bool userAddedToGame = UserDOA.AddUserToGame(userId, gameId);
+                if (!userAddedToGame)
+                {
+                    throw new Exception("Failed to add user to the game.");
                 }
 
                 // Populate items on board
@@ -105,20 +108,9 @@ namespace MouseTrapApp
                                 ItemId = reader.IsDBNull("Itemid") ? (int?)null : reader.GetInt32("Itemid"),
                                 UserId = reader.IsDBNull("Userid") ? (int?)null : reader.GetInt32("Userid")
                             };
-
-                            Console.WriteLine($"Tile retrieved - PositionY: {tile.PositionY}, PositionX: {tile.PositionX}, " +
-                                              $"TileTypeId: {tile.TileTypeId}, ItemId: {tile.ItemId}, UserId: {tile.UserId}");
-
                             tiles.Add(tile);
                         }
                     }
-                }
-
-                // Verify tile data
-                Console.WriteLine($"Total tiles retrieved: {tiles.Count}");
-                foreach (var tile in tiles)
-                {
-                    Console.WriteLine($"Tile - X: {tile.PositionX}, Y: {tile.PositionY}, TileTypeId: {tile.TileTypeId}, ItemId: {(tile.ItemId.HasValue ? tile.ItemId.ToString() : "None")}");
                 }
             }
             catch (Exception ex)
@@ -137,23 +129,26 @@ namespace MouseTrapApp
 
         public static void PopulateItemsOnBoard(int mapId)
         {
+            if (mySqlConnection.State == ConnectionState.Closed)
+            {
+                mySqlConnection.Open();
+            }
+
             try
             {
-
                 using (MySqlCommand cmd = new MySqlCommand("PopulateItemsOnBoard", mySqlConnection))
                 {
                     cmd.CommandType = CommandType.StoredProcedure;
                     cmd.Parameters.AddWithValue("p_map_id", mapId);
 
                     cmd.ExecuteNonQuery();
+                    Console.WriteLine($"Items populated on board for map ID: {mapId}");
                 }
             }
             catch (Exception ex)
             {
                 Console.WriteLine("Error populating items on board: " + ex.Message);
             }
-           
         }
-      
     }
 }
