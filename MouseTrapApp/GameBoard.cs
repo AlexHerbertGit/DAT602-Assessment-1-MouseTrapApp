@@ -1,4 +1,5 @@
-﻿using System;
+﻿using MySql.Data.MySqlClient;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -17,8 +18,11 @@ namespace MouseTrapApp
         private int maxColumns;
         private int mapId;
         private List<Tile> tiles;
+        private int currentX = 0;
+        private int currentY = 0;
+        private User _loggedInUser;
 
-        public GameBoard(int gameId, int maxRows, int maxColumns, int mapId, List<Tile> tiles)
+        public GameBoard(int gameId, int maxRows, int maxColumns, int mapId, List<Tile> tiles, User loggedInUser)
         {
             InitializeComponent();
 
@@ -28,6 +32,7 @@ namespace MouseTrapApp
             this.maxColumns = maxColumns;
             this.mapId = mapId;
             this.tiles = tiles ?? new List<Tile>();
+            this._loggedInUser = loggedInUser;
 
             //Set up the data grid view with the correct dimensions
             InitializeGameBoard();
@@ -110,7 +115,13 @@ namespace MouseTrapApp
                             // Only set the background for TileTypeId if there is no item
                             if (tile.TileTypeId == 1)
                             {
-                                cell.Style.BackColor = Color.LightGray; // Home Tile
+                                DataGridViewImageCell characterCell = new DataGridViewImageCell
+                                {
+                                    Value = Properties.Resources.PlayerImage,
+                                    ImageLayout = DataGridViewImageCellLayout.Zoom,
+                                    Style = { Alignment = DataGridViewContentAlignment.MiddleCenter }
+                                };
+                                dataGridView1.Rows[row].Cells[col] = characterCell;
                             }
                             else if (tile.TileTypeId == 2)
                             {
@@ -147,7 +158,136 @@ namespace MouseTrapApp
 
         private void dataGridView1_CellContentClick(object sender, DataGridViewCellEventArgs e)
         {
+            int targetX = e.ColumnIndex;
+            int targetY = e.RowIndex;
 
+            if (targetX >= 0 && targetY >= 0 && targetX < maxColumns && targetY < maxRows)
+            {
+                bool moveSuccessful = MovePlayerToTileInDatabase(targetX, targetY);
+
+                if (moveSuccessful)
+                {
+                    RefreshBoardAndTiles(); // Refresh board and tiles to reflect database changes
+                    UpdatePlayerPositionOnBoard(targetX, targetY); // Update the player image on the board
+                }
+                else
+                {
+                    MessageBox.Show("Invalid move. Please select an adjacent tile or avoid the barriers.");
+                }
+            }
+        }
+
+        private bool MovePlayerToTileInDatabase(int targetX, int targetY)
+        {
+            bool success = false;
+            try
+            {
+                if (DOA.mySqlConnection.State == ConnectionState.Closed)
+                {
+                    DOA.mySqlConnection.Open();
+                }
+                using (MySqlCommand cmd = new MySqlCommand("MovePlayerToTile", DOA.mySqlConnection))
+                {
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.Parameters.AddWithValue("p_user_id", _loggedInUser.Userid);
+                    cmd.Parameters.AddWithValue("p_current_x", currentX);
+                    cmd.Parameters.AddWithValue("p_current_y", currentY);
+                    cmd.Parameters.AddWithValue("p_target_x", targetX);
+                    cmd.Parameters.AddWithValue("p_target_y", targetY);
+
+                    cmd.ExecuteNonQuery();
+                    success = true;
+                }
+            }
+            catch (MySqlException ex)
+            {
+                Console.WriteLine("Error moving player in the database: " + ex.Message);
+                MessageBox.Show("Failed to move player: " + ex.Message, "Move Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                success = false;
+            }
+            finally
+            {
+                if (DOA.mySqlConnection.State == ConnectionState.Open)
+                {
+                    DOA.mySqlConnection.Close();
+                }
+            }
+            return success;
+        }
+
+        private void UpdatePlayerPositionOnBoard(int targetX, int targetY)
+        {
+            // Clear the previous position of the player character
+            foreach (DataGridViewRow row in dataGridView1.Rows)
+            {
+                foreach (DataGridViewCell cell in row.Cells)
+                {
+                    if (cell.Value == Properties.Resources.PlayerImage)
+                    {
+                        cell.Value = null; // Remove character image from the previous tile
+                        break;
+                    }
+                }
+            }
+
+            // Set the character image on the new target tile
+            dataGridView1.Rows[targetY].Cells[targetX].Value = Properties.Resources.PlayerImage;
+            currentX = targetX; // Update the current X and Y coordinates
+            currentY = targetY;
+        }
+
+        private void RefreshBoardAndTiles()
+        {
+            tiles = GetUpdatedTilesFromDatabase(); // Re-fetch updated tile data
+            PopulateGameBoard(); // Re-render the board with updated tile states
+        }
+
+        private List<Tile> GetUpdatedTilesFromDatabase()
+        {
+            List<Tile> updatedTiles = new List<Tile>();
+
+            try
+            {
+                if (DOA.mySqlConnection.State == ConnectionState.Closed)
+                {
+                    DOA.mySqlConnection.Open();
+                }
+
+                using (MySqlCommand getTilesCmd = new MySqlCommand("GetTilesForGame", DOA.mySqlConnection))
+                {
+                    getTilesCmd.CommandType = CommandType.StoredProcedure;
+                    getTilesCmd.Parameters.AddWithValue("p_game_id", gameId);
+
+                    using (MySqlDataReader reader = getTilesCmd.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            Tile tile = new Tile
+                            {
+                                PositionY = reader.GetInt32("position_y"),
+                                PositionX = reader.GetInt32("position_x"),
+                                TileTypeId = reader.GetInt32("TileTypeid"),
+                                ItemId = reader.IsDBNull("Itemid") ? (int?)null : reader.GetInt32("Itemid"),
+                                UserId = reader.IsDBNull("Userid") ? (int?)null : reader.GetInt32("Userid")
+                            };
+                            updatedTiles.Add(tile);
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Error retrieving updated tiles: " + ex.Message);
+            }
+            finally
+            {
+                if (DOA.mySqlConnection.State == ConnectionState.Open)
+                {
+                    DOA.mySqlConnection.Close();
+                }
+            }
+
+            return updatedTiles;
         }
     }
 }

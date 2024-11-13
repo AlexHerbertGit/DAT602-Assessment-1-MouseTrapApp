@@ -13,7 +13,7 @@ namespace MouseTrapApp
 {
     public class DOA
     {
-        private static string connectionString
+        public static string connectionString
         {
             get { return "Server=localhost;Port=3306;Database=MousetrapDB;Uid=root;password=Passw0rd123"; }
         }
@@ -85,6 +85,15 @@ namespace MouseTrapApp
                 if (!userAddedToGame)
                 {
                     throw new Exception("Failed to add user to the game.");
+                }
+                //Set user starting position on the home tile
+                using (MySqlCommand assignHomeTileCmd = new MySqlCommand("AssignUserToHomeTile", mySqlConnection))
+                {
+                    assignHomeTileCmd.CommandType = CommandType.StoredProcedure;
+                    assignHomeTileCmd.Parameters.AddWithValue("p_user_id", userId);
+                    assignHomeTileCmd.Parameters.AddWithValue("p_map_id", mapId);
+
+                    assignHomeTileCmd.ExecuteNonQuery();
                 }
 
                 // Populate items on board

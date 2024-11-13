@@ -31,19 +31,21 @@
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Administration));
             imgLogo = new PictureBox();
             groupBox1 = new GroupBox();
-            textBox1 = new TextBox();
+            btnDeleteAccount = new Button();
+            btnChangeUsername = new Button();
+            txtUserScore = new TextBox();
+            btnRemovePlayer = new Button();
+            btnUpdatePlayerInfo = new Button();
+            btnAddPlayer = new Button();
+            btnEndGame = new Button();
             label1 = new Label();
-            textBox2 = new TextBox();
-            textBox3 = new TextBox();
-            button1 = new Button();
-            button2 = new Button();
-            button3 = new Button();
-            button4 = new Button();
-            textBox4 = new TextBox();
-            button5 = new Button();
-            button6 = new Button();
+            txtSelectedUser = new TextBox();
+            activeGameView = new DataGridView();
+            activePlayerView = new DataGridView();
             ((System.ComponentModel.ISupportInitialize)imgLogo).BeginInit();
             groupBox1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)activeGameView).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)activePlayerView).BeginInit();
             SuspendLayout();
             // 
             // imgLogo
@@ -58,30 +60,90 @@
             // 
             // groupBox1
             // 
-            groupBox1.Controls.Add(button6);
-            groupBox1.Controls.Add(button5);
-            groupBox1.Controls.Add(textBox4);
-            groupBox1.Controls.Add(button4);
-            groupBox1.Controls.Add(button3);
-            groupBox1.Controls.Add(button2);
-            groupBox1.Controls.Add(button1);
-            groupBox1.Controls.Add(textBox3);
-            groupBox1.Controls.Add(textBox2);
+            groupBox1.Controls.Add(activePlayerView);
+            groupBox1.Controls.Add(activeGameView);
+            groupBox1.Controls.Add(btnDeleteAccount);
+            groupBox1.Controls.Add(btnChangeUsername);
+            groupBox1.Controls.Add(txtUserScore);
+            groupBox1.Controls.Add(btnRemovePlayer);
+            groupBox1.Controls.Add(btnUpdatePlayerInfo);
+            groupBox1.Controls.Add(btnAddPlayer);
+            groupBox1.Controls.Add(btnEndGame);
             groupBox1.Controls.Add(label1);
-            groupBox1.Controls.Add(textBox1);
+            groupBox1.Controls.Add(txtSelectedUser);
             groupBox1.Location = new Point(186, 205);
             groupBox1.Name = "groupBox1";
             groupBox1.Size = new Size(916, 434);
             groupBox1.TabIndex = 4;
             groupBox1.TabStop = false;
             // 
-            // textBox1
+            // btnDeleteAccount
             // 
-            textBox1.Location = new Point(343, 50);
-            textBox1.Name = "textBox1";
-            textBox1.PlaceholderText = "Selected Player Username";
-            textBox1.Size = new Size(226, 23);
-            textBox1.TabIndex = 0;
+            btnDeleteAccount.Location = new Point(84, 143);
+            btnDeleteAccount.Name = "btnDeleteAccount";
+            btnDeleteAccount.Size = new Size(152, 44);
+            btnDeleteAccount.TabIndex = 10;
+            btnDeleteAccount.Text = "Delete Account";
+            btnDeleteAccount.UseVisualStyleBackColor = true;
+            btnDeleteAccount.Click += btnDeleteAccount_Click;
+            // 
+            // btnChangeUsername
+            // 
+            btnChangeUsername.Location = new Point(84, 79);
+            btnChangeUsername.Name = "btnChangeUsername";
+            btnChangeUsername.Size = new Size(155, 44);
+            btnChangeUsername.TabIndex = 9;
+            btnChangeUsername.Text = "Change Username";
+            btnChangeUsername.UseVisualStyleBackColor = true;
+            btnChangeUsername.Click += btnChangeUsername_Click;
+            // 
+            // txtUserScore
+            // 
+            txtUserScore.Location = new Point(575, 50);
+            txtUserScore.Name = "txtUserScore";
+            txtUserScore.PlaceholderText = "High Score";
+            txtUserScore.Size = new Size(178, 23);
+            txtUserScore.TabIndex = 8;
+            // 
+            // btnRemovePlayer
+            // 
+            btnRemovePlayer.Location = new Point(810, 363);
+            btnRemovePlayer.Name = "btnRemovePlayer";
+            btnRemovePlayer.Size = new Size(84, 29);
+            btnRemovePlayer.TabIndex = 7;
+            btnRemovePlayer.Text = "Remove";
+            btnRemovePlayer.UseVisualStyleBackColor = true;
+            btnRemovePlayer.Click += btnRemovePlayer_Click;
+            // 
+            // btnUpdatePlayerInfo
+            // 
+            btnUpdatePlayerInfo.Location = new Point(720, 363);
+            btnUpdatePlayerInfo.Name = "btnUpdatePlayerInfo";
+            btnUpdatePlayerInfo.Size = new Size(84, 29);
+            btnUpdatePlayerInfo.TabIndex = 6;
+            btnUpdatePlayerInfo.Text = "Update Info";
+            btnUpdatePlayerInfo.UseVisualStyleBackColor = true;
+            btnUpdatePlayerInfo.Click += btnUpdatePlayerInfo_Click;
+            // 
+            // btnAddPlayer
+            // 
+            btnAddPlayer.Location = new Point(630, 363);
+            btnAddPlayer.Name = "btnAddPlayer";
+            btnAddPlayer.Size = new Size(84, 29);
+            btnAddPlayer.TabIndex = 5;
+            btnAddPlayer.Text = "Add Player";
+            btnAddPlayer.UseVisualStyleBackColor = true;
+            btnAddPlayer.Click += btnAddPlayer_Click;
+            // 
+            // btnEndGame
+            // 
+            btnEndGame.Location = new Point(343, 363);
+            btnEndGame.Name = "btnEndGame";
+            btnEndGame.Size = new Size(105, 29);
+            btnEndGame.TabIndex = 4;
+            btnEndGame.Text = "End Game";
+            btnEndGame.UseVisualStyleBackColor = true;
+            btnEndGame.Click += btnEndGame_Click;
             // 
             // label1
             // 
@@ -94,85 +156,31 @@
             label1.Text = "Admin Dashboard";
             label1.Click += label1_Click;
             // 
-            // textBox2
+            // txtSelectedUser
             // 
-            textBox2.Location = new Point(630, 79);
-            textBox2.Multiline = true;
-            textBox2.Name = "textBox2";
-            textBox2.PlaceholderText = "Active Players List";
-            textBox2.Size = new Size(263, 269);
-            textBox2.TabIndex = 2;
+            txtSelectedUser.Location = new Point(343, 50);
+            txtSelectedUser.Name = "txtSelectedUser";
+            txtSelectedUser.PlaceholderText = "Selected Player Username";
+            txtSelectedUser.Size = new Size(226, 23);
+            txtSelectedUser.TabIndex = 0;
             // 
-            // textBox3
+            // activeGameView
             // 
-            textBox3.Location = new Point(343, 79);
-            textBox3.Multiline = true;
-            textBox3.Name = "textBox3";
-            textBox3.PlaceholderText = "Active Games List";
-            textBox3.Size = new Size(281, 269);
-            textBox3.TabIndex = 3;
+            activeGameView.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            activeGameView.Location = new Point(342, 89);
+            activeGameView.Name = "activeGameView";
+            activeGameView.Size = new Size(227, 268);
+            activeGameView.TabIndex = 11;
+            activeGameView.CellContentClick += activeGameView_CellContentClick;
             // 
-            // button1
+            // activePlayerView
             // 
-            button1.Location = new Point(343, 363);
-            button1.Name = "button1";
-            button1.Size = new Size(105, 29);
-            button1.TabIndex = 4;
-            button1.Text = "End Game";
-            button1.UseVisualStyleBackColor = true;
-            // 
-            // button2
-            // 
-            button2.Location = new Point(630, 363);
-            button2.Name = "button2";
-            button2.Size = new Size(84, 29);
-            button2.TabIndex = 5;
-            button2.Text = "Add Player";
-            button2.UseVisualStyleBackColor = true;
-            // 
-            // button3
-            // 
-            button3.Location = new Point(720, 363);
-            button3.Name = "button3";
-            button3.Size = new Size(84, 29);
-            button3.TabIndex = 6;
-            button3.Text = "Update Info";
-            button3.UseVisualStyleBackColor = true;
-            // 
-            // button4
-            // 
-            button4.Location = new Point(810, 363);
-            button4.Name = "button4";
-            button4.Size = new Size(84, 29);
-            button4.TabIndex = 7;
-            button4.Text = "Remove";
-            button4.UseVisualStyleBackColor = true;
-            // 
-            // textBox4
-            // 
-            textBox4.Location = new Point(575, 50);
-            textBox4.Name = "textBox4";
-            textBox4.PlaceholderText = "High Score";
-            textBox4.Size = new Size(178, 23);
-            textBox4.TabIndex = 8;
-            // 
-            // button5
-            // 
-            button5.Location = new Point(84, 79);
-            button5.Name = "button5";
-            button5.Size = new Size(155, 44);
-            button5.TabIndex = 9;
-            button5.Text = "Change Username";
-            button5.UseVisualStyleBackColor = true;
-            // 
-            // button6
-            // 
-            button6.Location = new Point(84, 143);
-            button6.Name = "button6";
-            button6.Size = new Size(152, 44);
-            button6.TabIndex = 10;
-            button6.Text = "Delete Account";
-            button6.UseVisualStyleBackColor = true;
+            activePlayerView.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            activePlayerView.Location = new Point(575, 89);
+            activePlayerView.Name = "activePlayerView";
+            activePlayerView.Size = new Size(240, 268);
+            activePlayerView.TabIndex = 12;
+            activePlayerView.CellContentClick += activePlayerView_CellContentClick;
             // 
             // Administration
             // 
@@ -187,6 +195,8 @@
             ((System.ComponentModel.ISupportInitialize)imgLogo).EndInit();
             groupBox1.ResumeLayout(false);
             groupBox1.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)activeGameView).EndInit();
+            ((System.ComponentModel.ISupportInitialize)activePlayerView).EndInit();
             ResumeLayout(false);
         }
 
@@ -195,15 +205,15 @@
         private PictureBox imgLogo;
         private GroupBox groupBox1;
         private Label label1;
-        private TextBox textBox1;
-        private TextBox textBox3;
-        private TextBox textBox2;
-        private Button button6;
-        private Button button5;
-        private TextBox textBox4;
-        private Button button4;
-        private Button button3;
-        private Button button2;
-        private Button button1;
+        private TextBox txtSelectedUser;
+        private Button btnDeleteAccount;
+        private Button btnChangeUsername;
+        private TextBox txtUserScore;
+        private Button btnRemovePlayer;
+        private Button btnUpdatePlayerInfo;
+        private Button btnAddPlayer;
+        private Button btnEndGame;
+        private DataGridView activePlayerView;
+        private DataGridView activeGameView;
     }
 }

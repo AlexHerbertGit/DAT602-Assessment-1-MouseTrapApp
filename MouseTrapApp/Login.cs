@@ -58,15 +58,28 @@ namespace MouseTrapApp
 
             if (accountLocked)
             {
-                MessageBox.Show("User Account is locked due to multiple failed login attempts, please contact and admin");
+                MessageBox.Show("User Account is locked due to multiple failed login attempts, please contact an admin.");
             }
-            else if (loginSuccessful)
+            else if (loginSuccessful && user != null)
             {
                 MessageBox.Show("Login successful!");
-
-                //Create and Display Main Menu Window
+                
+                // Create and Display Main Menu Window
                 MainMenu mainMenu = new MainMenu(user);
                 mainMenu.Show();
+
+                MessageBox.Show(
+                    $"User Information:\n\n" +
+                    $"Username: {user.Username}\n" +
+                    $"User ID: {user.Userid}\n" +
+                    $"Score: {user.Score}\n" +
+                    $"Is Admin: {user.IsAdmin}\n" +
+                    $"Health: {user.Health}\n" +
+                    $"Inventory ID: {user.InventoryId}",
+                    "User Details",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Information
+                );
 
                 this.Hide();
             }

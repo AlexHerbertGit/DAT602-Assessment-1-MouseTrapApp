@@ -31,16 +31,20 @@ namespace MouseTrapApp
             }
         }
 
-        public static (bool loginSuccessful, bool accountLocked, User user) LoginUser(string username, string password)
+        public static (bool loginSuccessful, bool accountLocked, User? user) LoginUser(string username, string password)
         {
             bool loginSuccessful = false;
             bool accountLocked = false;
-            User? user = null;
+            User user = null;
 
             try
             {
-                mySqlConnection.Open();
+                if (mySqlConnection.State == ConnectionState.Closed)
+                {
+                    mySqlConnection.Open();
+                }
 
+                // Step 1: Attempt Login and Lockout Checks
                 using (MySqlCommand cmd = new MySqlCommand("PlayerLogin", mySqlConnection))
                 {
                     cmd.CommandType = CommandType.StoredProcedure;
@@ -59,9 +63,11 @@ namespace MouseTrapApp
                     // Retrieve output values
                     loginSuccessful = Convert.ToBoolean(cmd.Parameters["p_login_successful"].Value);
                     accountLocked = Convert.ToBoolean(cmd.Parameters["p_account_locked"].Value);
+
+                    Console.WriteLine($"Login successful: {loginSuccessful}, Account locked: {accountLocked}");
                 }
 
-                // Retrieve user details if login was successful
+                // Step 2: Retrieve User Details if Login Succeeded
                 if (loginSuccessful)
                 {
                     using (MySqlCommand cmd = new MySqlCommand("GetUserDetails", mySqlConnection))
@@ -70,7 +76,6 @@ namespace MouseTrapApp
                         cmd.Parameters.AddWithValue("p_username", username);
 
                         cmd.Parameters.Add(new MySqlParameter("p_user_id", MySqlDbType.Int32) { Direction = ParameterDirection.Output });
-                        cmd.Parameters.Add(new MySqlParameter("p_user_name", MySqlDbType.VarChar, 100) { Direction = ParameterDirection.Output });
                         cmd.Parameters.Add(new MySqlParameter("p_score", MySqlDbType.Int32) { Direction = ParameterDirection.Output });
                         cmd.Parameters.Add(new MySqlParameter("p_is_admin", MySqlDbType.Bit) { Direction = ParameterDirection.Output });
                         cmd.Parameters.Add(new MySqlParameter("p_health", MySqlDbType.Int32) { Direction = ParameterDirection.Output });
@@ -79,16 +84,27 @@ namespace MouseTrapApp
                         // Execute stored procedure
                         cmd.ExecuteNonQuery();
 
-                        // Populate User object with values
-                        user = new User
+                        // Confirm we have all required details
+                        if (cmd.Parameters["p_user_id"].Value != DBNull.Value)
                         {
-                            Userid = Convert.ToInt32(cmd.Parameters["p_user_id"].Value),
-                            Username = cmd.Parameters["p_user_name"].Value.ToString(),
-                            Score = Convert.ToInt32(cmd.Parameters["p_score"].Value),
-                            IsAdmin = Convert.ToBoolean(cmd.Parameters["p_is_admin"].Value),
-                            Health = Convert.ToInt32(cmd.Parameters["p_health"].Value),
-                            InventoryId = Convert.ToInt32(cmd.Parameters["p_inventory_id"].Value)
-                        };
+                            // Populate User object with values
+                            user = new User
+                            {
+                                Userid = Convert.ToInt32(cmd.Parameters["p_user_id"].Value),
+                                Username = username,
+                                Score = Convert.ToInt32(cmd.Parameters["p_score"].Value),
+                                IsAdmin = Convert.ToInt32(cmd.Parameters["p_is_admin"].Value) == 1,
+                                Health = Convert.ToInt32(cmd.Parameters["p_health"].Value),
+                                InventoryId = cmd.Parameters["p_inventory_id"].Value == DBNull.Value ? (int?)null : Convert.ToInt32(cmd.Parameters["p_inventory_id"].Value)
+                            };
+
+                            Console.WriteLine($"Retrieved User: ID={user.Userid}, Admin={user.IsAdmin}");
+                        }
+                        else
+                        {
+                            Console.WriteLine("Error: User details not found.");
+                            loginSuccessful = false; // Ensure login fails if user details are missing
+                        }
                     }
                 }
             }
@@ -104,7 +120,7 @@ namespace MouseTrapApp
                 }
             }
 
-            return (loginSuccessful, accountLocked, user!);
+            return (loginSuccessful, accountLocked, user);
         }
 
         public static bool CreateUser(string username, string password)

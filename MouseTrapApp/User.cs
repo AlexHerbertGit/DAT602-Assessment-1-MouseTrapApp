@@ -14,6 +14,6 @@ namespace MouseTrapApp
         public int Score { get; set; }
         public bool IsAdmin { get; set; }
         public int Health { get; set; }
-        public int InventoryId { get; set; }
+        public int? InventoryId { get; set; }
     }
 }

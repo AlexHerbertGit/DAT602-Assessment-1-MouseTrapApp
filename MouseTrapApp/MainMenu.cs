@@ -13,11 +13,11 @@ namespace MouseTrapApp
 {
     public partial class MainMenu : Form
     {
-        public User _loggedInUser;
-        public MainMenu(User user)
+        private User _loggedInUser;
+        public MainMenu(User loggedInUser)
         {
             InitializeComponent();
-            _loggedInUser = user;
+            _loggedInUser = loggedInUser;
         }
 
         private void groupBox1_Enter(object sender, EventArgs e)
@@ -50,13 +50,26 @@ namespace MouseTrapApp
                     Console.WriteLine($"Loaded {tiles.Count} tiles for game board.");
                 }
 
-                GameBoard gameBoard = new GameBoard(gameId, maxRows, maxColumns, mapId, tiles);
+                GameBoard gameBoard = new GameBoard(gameId, maxRows, maxColumns, mapId, tiles, _loggedInUser);
                 gameBoard.ShowDialog();
                 this.Hide();
             }
             catch (Exception ex)
             {
                 MessageBox.Show("Error starting the game: " + ex.Message);
+            }
+        }
+
+        private void btnAdminDash_Click(object sender, EventArgs e)
+        {
+            if (_loggedInUser?.IsAdmin == true)
+            {
+                Administration adminForm = new Administration();
+                adminForm.ShowDialog();
+            }
+            else
+            {
+                MessageBox.Show("Access Denied: This feature is restricted to admin users only.", "Admin Only", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
         }
     }

@@ -34,16 +34,20 @@
             btnLogout = new Button();
             label1 = new Label();
             btnStartGame = new Button();
+            btnAdminDash = new Button();
+            imgLogo = new PictureBox();
             mainMenuGroupBox.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)imgLogo).BeginInit();
             SuspendLayout();
             // 
             // mainMenuGroupBox
             // 
+            mainMenuGroupBox.Controls.Add(btnAdminDash);
             mainMenuGroupBox.Controls.Add(btnCloseApp);
             mainMenuGroupBox.Controls.Add(btnLogout);
             mainMenuGroupBox.Controls.Add(label1);
             mainMenuGroupBox.Controls.Add(btnStartGame);
-            mainMenuGroupBox.Location = new Point(379, 144);
+            mainMenuGroupBox.Location = new Point(391, 219);
             mainMenuGroupBox.Name = "mainMenuGroupBox";
             mainMenuGroupBox.Size = new Size(518, 399);
             mainMenuGroupBox.TabIndex = 0;
@@ -91,17 +95,39 @@
             btnStartGame.UseVisualStyleBackColor = true;
             btnStartGame.Click += btnStartGame_Click;
             // 
+            // btnAdminDash
+            // 
+            btnAdminDash.Location = new Point(130, 148);
+            btnAdminDash.Name = "btnAdminDash";
+            btnAdminDash.Size = new Size(259, 47);
+            btnAdminDash.TabIndex = 4;
+            btnAdminDash.Text = "Admin Dashboard";
+            btnAdminDash.UseVisualStyleBackColor = true;
+            btnAdminDash.Click += btnAdminDash_Click;
+            // 
+            // imgLogo
+            // 
+            imgLogo.BackgroundImage = (Image)resources.GetObject("imgLogo.BackgroundImage");
+            imgLogo.BackgroundImageLayout = ImageLayout.Stretch;
+            imgLogo.Location = new Point(561, 12);
+            imgLogo.Name = "imgLogo";
+            imgLogo.Size = new Size(182, 173);
+            imgLogo.TabIndex = 2;
+            imgLogo.TabStop = false;
+            // 
             // MainMenu
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             BackgroundImage = (Image)resources.GetObject("$this.BackgroundImage");
             ClientSize = new Size(1264, 681);
+            Controls.Add(imgLogo);
             Controls.Add(mainMenuGroupBox);
             Name = "MainMenu";
             Text = "MainMenu";
             mainMenuGroupBox.ResumeLayout(false);
             mainMenuGroupBox.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)imgLogo).EndInit();
             ResumeLayout(false);
         }
 
@@ -112,5 +138,7 @@
         private Label label1;
         private Button btnLogout;
         private Button btnCloseApp;
+        private Button btnAdminDash;
+        private PictureBox imgLogo;
     }
 }
