@@ -31,8 +31,8 @@
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Administration));
             imgLogo = new PictureBox();
             groupBox1 = new GroupBox();
-            btnDeleteAccount = new Button();
-            btnChangeUsername = new Button();
+            activePlayerView = new DataGridView();
+            activeGameView = new DataGridView();
             txtUserScore = new TextBox();
             btnRemovePlayer = new Button();
             btnUpdatePlayerInfo = new Button();
@@ -40,12 +40,10 @@
             btnEndGame = new Button();
             label1 = new Label();
             txtSelectedUser = new TextBox();
-            activeGameView = new DataGridView();
-            activePlayerView = new DataGridView();
             ((System.ComponentModel.ISupportInitialize)imgLogo).BeginInit();
             groupBox1.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)activeGameView).BeginInit();
             ((System.ComponentModel.ISupportInitialize)activePlayerView).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)activeGameView).BeginInit();
             SuspendLayout();
             // 
             // imgLogo
@@ -62,8 +60,6 @@
             // 
             groupBox1.Controls.Add(activePlayerView);
             groupBox1.Controls.Add(activeGameView);
-            groupBox1.Controls.Add(btnDeleteAccount);
-            groupBox1.Controls.Add(btnChangeUsername);
             groupBox1.Controls.Add(txtUserScore);
             groupBox1.Controls.Add(btnRemovePlayer);
             groupBox1.Controls.Add(btnUpdatePlayerInfo);
@@ -77,25 +73,31 @@
             groupBox1.TabIndex = 4;
             groupBox1.TabStop = false;
             // 
-            // btnDeleteAccount
+            // activePlayerView
             // 
-            btnDeleteAccount.Location = new Point(84, 143);
-            btnDeleteAccount.Name = "btnDeleteAccount";
-            btnDeleteAccount.Size = new Size(152, 44);
-            btnDeleteAccount.TabIndex = 10;
-            btnDeleteAccount.Text = "Delete Account";
-            btnDeleteAccount.UseVisualStyleBackColor = true;
-            btnDeleteAccount.Click += btnDeleteAccount_Click;
+            activePlayerView.AllowUserToAddRows = false;
+            activePlayerView.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            activePlayerView.Location = new Point(575, 89);
+            activePlayerView.MultiSelect = false;
+            activePlayerView.Name = "activePlayerView";
+            activePlayerView.ReadOnly = true;
+            activePlayerView.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
+            activePlayerView.Size = new Size(264, 268);
+            activePlayerView.TabIndex = 12;
+            activePlayerView.CellContentClick += activePlayerView_CellContentClick;
             // 
-            // btnChangeUsername
+            // activeGameView
             // 
-            btnChangeUsername.Location = new Point(84, 79);
-            btnChangeUsername.Name = "btnChangeUsername";
-            btnChangeUsername.Size = new Size(155, 44);
-            btnChangeUsername.TabIndex = 9;
-            btnChangeUsername.Text = "Change Username";
-            btnChangeUsername.UseVisualStyleBackColor = true;
-            btnChangeUsername.Click += btnChangeUsername_Click;
+            activeGameView.AllowUserToAddRows = false;
+            activeGameView.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            activeGameView.Location = new Point(278, 89);
+            activeGameView.MultiSelect = false;
+            activeGameView.Name = "activeGameView";
+            activeGameView.ReadOnly = true;
+            activeGameView.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
+            activeGameView.Size = new Size(291, 268);
+            activeGameView.TabIndex = 11;
+            activeGameView.CellContentClick += activeGameView_CellContentClick;
             // 
             // txtUserScore
             // 
@@ -107,7 +109,7 @@
             // 
             // btnRemovePlayer
             // 
-            btnRemovePlayer.Location = new Point(810, 363);
+            btnRemovePlayer.Location = new Point(755, 363);
             btnRemovePlayer.Name = "btnRemovePlayer";
             btnRemovePlayer.Size = new Size(84, 29);
             btnRemovePlayer.TabIndex = 7;
@@ -117,7 +119,7 @@
             // 
             // btnUpdatePlayerInfo
             // 
-            btnUpdatePlayerInfo.Location = new Point(720, 363);
+            btnUpdatePlayerInfo.Location = new Point(665, 363);
             btnUpdatePlayerInfo.Name = "btnUpdatePlayerInfo";
             btnUpdatePlayerInfo.Size = new Size(84, 29);
             btnUpdatePlayerInfo.TabIndex = 6;
@@ -127,7 +129,7 @@
             // 
             // btnAddPlayer
             // 
-            btnAddPlayer.Location = new Point(630, 363);
+            btnAddPlayer.Location = new Point(575, 363);
             btnAddPlayer.Name = "btnAddPlayer";
             btnAddPlayer.Size = new Size(84, 29);
             btnAddPlayer.TabIndex = 5;
@@ -137,7 +139,7 @@
             // 
             // btnEndGame
             // 
-            btnEndGame.Location = new Point(343, 363);
+            btnEndGame.Location = new Point(278, 363);
             btnEndGame.Name = "btnEndGame";
             btnEndGame.Size = new Size(105, 29);
             btnEndGame.TabIndex = 4;
@@ -158,29 +160,11 @@
             // 
             // txtSelectedUser
             // 
-            txtSelectedUser.Location = new Point(343, 50);
+            txtSelectedUser.Location = new Point(278, 50);
             txtSelectedUser.Name = "txtSelectedUser";
             txtSelectedUser.PlaceholderText = "Selected Player Username";
             txtSelectedUser.Size = new Size(226, 23);
             txtSelectedUser.TabIndex = 0;
-            // 
-            // activeGameView
-            // 
-            activeGameView.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            activeGameView.Location = new Point(342, 89);
-            activeGameView.Name = "activeGameView";
-            activeGameView.Size = new Size(227, 268);
-            activeGameView.TabIndex = 11;
-            activeGameView.CellContentClick += activeGameView_CellContentClick;
-            // 
-            // activePlayerView
-            // 
-            activePlayerView.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            activePlayerView.Location = new Point(575, 89);
-            activePlayerView.Name = "activePlayerView";
-            activePlayerView.Size = new Size(240, 268);
-            activePlayerView.TabIndex = 12;
-            activePlayerView.CellContentClick += activePlayerView_CellContentClick;
             // 
             // Administration
             // 
@@ -195,8 +179,8 @@
             ((System.ComponentModel.ISupportInitialize)imgLogo).EndInit();
             groupBox1.ResumeLayout(false);
             groupBox1.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)activeGameView).EndInit();
             ((System.ComponentModel.ISupportInitialize)activePlayerView).EndInit();
+            ((System.ComponentModel.ISupportInitialize)activeGameView).EndInit();
             ResumeLayout(false);
         }
 
@@ -206,8 +190,6 @@
         private GroupBox groupBox1;
         private Label label1;
         private TextBox txtSelectedUser;
-        private Button btnDeleteAccount;
-        private Button btnChangeUsername;
         private TextBox txtUserScore;
         private Button btnRemovePlayer;
         private Button btnUpdatePlayerInfo;
