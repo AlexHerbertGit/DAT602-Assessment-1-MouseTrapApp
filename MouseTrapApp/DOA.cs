@@ -42,83 +42,99 @@ namespace MouseTrapApp
 
             try
             {
-                mySqlConnection.Open();
-
-                // Create a new game
-                using (MySqlCommand createGameCmd = new MySqlCommand("CreateNewGame", mySqlConnection))
+                if (mySqlConnection.State == ConnectionState.Closed)
                 {
-                    createGameCmd.CommandType = CommandType.StoredProcedure;
+                    mySqlConnection.Open();
+                }
 
-                    MySqlParameter gameIdParam = new MySqlParameter("p_game_id", MySqlDbType.Int32)
+                using (var transaction = mySqlConnection.BeginTransaction())
+                {
+                    try
                     {
-                        Direction = ParameterDirection.Output
-                    };
-                    createGameCmd.Parameters.Add(gameIdParam);
-
-                    createGameCmd.ExecuteNonQuery();
-                    gameId = gameIdParam.Value != DBNull.Value ? Convert.ToInt32(gameIdParam.Value) : -1;
-                }
-
-                // Fetch map dimensions
-                using (MySqlCommand getMapDimensionsCmd = new MySqlCommand("GetMapDimensionsForGame", mySqlConnection))
-                {
-                    getMapDimensionsCmd.CommandType = CommandType.StoredProcedure;
-                    getMapDimensionsCmd.Parameters.AddWithValue("p_game_id", gameId);
-
-                    MySqlParameter maxRowsParam = new MySqlParameter("p_max_rows", MySqlDbType.Int32) { Direction = ParameterDirection.Output };
-                    MySqlParameter maxColumnsParam = new MySqlParameter("p_max_columns", MySqlDbType.Int32) { Direction = ParameterDirection.Output };
-                    MySqlParameter mapIdParam = new MySqlParameter("p_map_id", MySqlDbType.Int32) { Direction = ParameterDirection.Output };
-
-                    getMapDimensionsCmd.Parameters.Add(maxRowsParam);
-                    getMapDimensionsCmd.Parameters.Add(maxColumnsParam);
-                    getMapDimensionsCmd.Parameters.Add(mapIdParam);
-
-                    getMapDimensionsCmd.ExecuteNonQuery();
-
-                    maxRows = maxRowsParam.Value != DBNull.Value ? Convert.ToInt32(maxRowsParam.Value) : 0;
-                    maxColumns = maxColumnsParam.Value != DBNull.Value ? Convert.ToInt32(maxColumnsParam.Value) : 0;
-                    mapId = mapIdParam.Value != DBNull.Value ? Convert.ToInt32(mapIdParam.Value) : -1;
-                }
-
-                // Add user to the newly created game
-                bool userAddedToGame = UserDOA.AddUserToGame(userId, gameId);
-                if (!userAddedToGame)
-                {
-                    throw new Exception("Failed to add user to the game.");
-                }
-                //Set user starting position on the home tile
-                using (MySqlCommand assignHomeTileCmd = new MySqlCommand("AssignUserToHomeTile", mySqlConnection))
-                {
-                    assignHomeTileCmd.CommandType = CommandType.StoredProcedure;
-                    assignHomeTileCmd.Parameters.AddWithValue("p_user_id", userId);
-                    assignHomeTileCmd.Parameters.AddWithValue("p_map_id", mapId);
-
-                    assignHomeTileCmd.ExecuteNonQuery();
-                }
-
-                // Populate items on board
-                PopulateItemsOnBoard(mapId);
-
-                // Retrieve tiles with updated items
-                using (MySqlCommand getTilesCmd = new MySqlCommand("GetTilesForGame", mySqlConnection))
-                {
-                    getTilesCmd.CommandType = CommandType.StoredProcedure;
-                    getTilesCmd.Parameters.AddWithValue("p_game_id", gameId);
-
-                    using (MySqlDataReader reader = getTilesCmd.ExecuteReader())
-                    {
-                        while (reader.Read())
+                        // Create a new game
+                        using (MySqlCommand createGameCmd = new MySqlCommand("CreateNewGame", mySqlConnection, transaction))
                         {
-                            Tile tile = new Tile
+                            createGameCmd.CommandType = CommandType.StoredProcedure;
+
+                            MySqlParameter gameIdParam = new MySqlParameter("p_game_id", MySqlDbType.Int32)
                             {
-                                PositionY = reader.GetInt32("position_y"),
-                                PositionX = reader.GetInt32("position_x"),
-                                TileTypeId = reader.GetInt32("TileTypeid"),
-                                ItemId = reader.IsDBNull("Itemid") ? (int?)null : reader.GetInt32("Itemid"),
-                                UserId = reader.IsDBNull("Userid") ? (int?)null : reader.GetInt32("Userid")
+                                Direction = ParameterDirection.Output
                             };
-                            tiles.Add(tile);
+                            createGameCmd.Parameters.Add(gameIdParam);
+
+                            createGameCmd.ExecuteNonQuery();
+                            gameId = gameIdParam.Value != DBNull.Value ? Convert.ToInt32(gameIdParam.Value) : -1;
                         }
+
+                        // Fetch map dimensions
+                        using (MySqlCommand getMapDimensionsCmd = new MySqlCommand("GetMapDimensionsForGame", mySqlConnection, transaction))
+                        {
+                            getMapDimensionsCmd.CommandType = CommandType.StoredProcedure;
+                            getMapDimensionsCmd.Parameters.AddWithValue("p_game_id", gameId);
+
+                            MySqlParameter maxRowsParam = new MySqlParameter("p_max_rows", MySqlDbType.Int32) { Direction = ParameterDirection.Output };
+                            MySqlParameter maxColumnsParam = new MySqlParameter("p_max_columns", MySqlDbType.Int32) { Direction = ParameterDirection.Output };
+                            MySqlParameter mapIdParam = new MySqlParameter("p_map_id", MySqlDbType.Int32) { Direction = ParameterDirection.Output };
+
+                            getMapDimensionsCmd.Parameters.Add(maxRowsParam);
+                            getMapDimensionsCmd.Parameters.Add(maxColumnsParam);
+                            getMapDimensionsCmd.Parameters.Add(mapIdParam);
+
+                            getMapDimensionsCmd.ExecuteNonQuery();
+
+                            maxRows = maxRowsParam.Value != DBNull.Value ? Convert.ToInt32(maxRowsParam.Value) : 0;
+                            maxColumns = maxColumnsParam.Value != DBNull.Value ? Convert.ToInt32(maxColumnsParam.Value) : 0;
+                            mapId = mapIdParam.Value != DBNull.Value ? Convert.ToInt32(mapIdParam.Value) : -1;
+                        }
+
+                        // Add user to the newly created game
+                        bool userAddedToGame = UserDOA.AddUserToGame(userId, gameId);
+                        if (!userAddedToGame)
+                        {
+                            throw new Exception("Failed to add user to the game.");
+                        }
+                        //Set user starting position on the home tile
+                        using (MySqlCommand assignHomeTileCmd = new MySqlCommand("AssignUserToHomeTile", mySqlConnection, transaction))
+                        {
+                            assignHomeTileCmd.CommandType = CommandType.StoredProcedure;
+                            assignHomeTileCmd.Parameters.AddWithValue("p_user_id", userId);
+                            assignHomeTileCmd.Parameters.AddWithValue("p_map_id", mapId);
+
+                            assignHomeTileCmd.ExecuteNonQuery();
+                        }
+
+                        // Populate items on board
+                        PopulateItemsOnBoard(mapId, transaction);
+
+                        // Retrieve tiles with updated items
+                        using (MySqlCommand getTilesCmd = new MySqlCommand("GetTilesForGame", mySqlConnection, transaction))
+                        {
+                            getTilesCmd.CommandType = CommandType.StoredProcedure;
+                            getTilesCmd.Parameters.AddWithValue("p_game_id", gameId);
+
+                            using (MySqlDataReader reader = getTilesCmd.ExecuteReader())
+                            {
+                                while (reader.Read())
+                                {
+                                    Tile tile = new Tile
+                                    {
+                                        PositionY = reader.GetInt32("position_y"),
+                                        PositionX = reader.GetInt32("position_x"),
+                                        TileTypeId = reader.GetInt32("TileTypeid"),
+                                        ItemId = reader.IsDBNull("Itemid") ? (int?)null : reader.GetInt32("Itemid"),
+                                        UserId = reader.IsDBNull("Userid") ? (int?)null : reader.GetInt32("Userid")
+                                    };
+                                    tiles.Add(tile);
+                                }
+                            }
+                        }
+
+                        transaction.Commit();
+                    }
+                    catch
+                    {
+                        transaction.Rollback();
+                        throw;
                     }
                 }
             }
@@ -136,16 +152,11 @@ namespace MouseTrapApp
             return (gameId, maxRows, maxColumns, mapId, tiles);
         }
 
-        public static void PopulateItemsOnBoard(int mapId)
+        public static void PopulateItemsOnBoard(int mapId, MySqlTransaction transaction)
         {
-            if (mySqlConnection.State == ConnectionState.Closed)
-            {
-                mySqlConnection.Open();
-            }
-
             try
             {
-                using (MySqlCommand cmd = new MySqlCommand("PopulateItemsOnBoard", mySqlConnection))
+                using (MySqlCommand cmd = new MySqlCommand("PopulateItemsOnBoard", mySqlConnection, transaction))
                 {
                     cmd.CommandType = CommandType.StoredProcedure;
                     cmd.Parameters.AddWithValue("p_map_id", mapId);
@@ -156,7 +167,8 @@ namespace MouseTrapApp
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Error populating items on board: " + ex.Message);
+                Console.WriteLine($"Error populating items on board: {ex.Message}");
+                throw;
             }
         }
     }
